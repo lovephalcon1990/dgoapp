@@ -1,0 +1,65 @@
+<link rel="stylesheet" href="public/css/admin.css" media="all">
+<link rel="stylesheet" href="public/css/login.css" media="all">
+<style>
+    .layadmin-user-login-body i{
+        pos
+    }
+</style>
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+    <form class="layadmin-user-login-body layui-form">
+        <div class="layadmin-user-login-main">
+            <div class="layadmin-user-login-box layadmin-user-login-header">
+                <h2>DataAdmin</h2>
+                <p>商户后台管理系统</p>
+            </div>
+            <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+                <div class="layui-form-item">
+                    <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+                    <input type="text" name="username" id="LAY-user-login-username" lay-verify="name" placeholder="用户名" class="layui-input">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+                    <input type="password" name="password" id="LAY-user-login-password" lay-verify="require" placeholder="密码" class="layui-input">
+                </div>
+                <div class="layui-form-item">
+                    <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+                    <input type="text" name="code" id="LAY-user-login-password" lay-verify="require" placeholder="google验证码" class="layui-input">
+                </div>
+
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-app-login-index-form">登 入</button>
+                </div>
+                <div class="layui-trans layui-form-item layadmin-user-login-other">
+
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="layui-trans layadmin-user-login-footer">
+        <p>© 2020 <a href="/" target="_blank">商户后台管理系统</a></p>
+    </div>
+
+</div>
+
+<script>
+    layui.use(['form', 'admin', 'app'], function(form, admin) {
+        var search = layui.router().search;
+        console.log(layui.setter.requestUri);
+        form.on('submit(LAY-app-login-index-form)', function(d) {
+            console.log(layui.setter.requestUri);
+            admin.request({
+                type: 'post',
+                data: d.field,
+                url: layui.setter.requestUri + 'user/login',
+                done: function(res) {
+                    if(res.code == 200){
+                        layui.app.setCookie("jwt", res.token, 4);
+                        window.location = search.redirect ? "/#"+decodeURIComponent(search.redirect) : '/';
+                        // location.hash = search.redirect ? decodeURIComponent(search.redirect) : '/';
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>

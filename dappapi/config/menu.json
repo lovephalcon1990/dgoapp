@@ -1,0 +1,48 @@
+{
+    "title":"menu"
+    ,"list":[
+        {
+            "name":"mng","title":"系统管理","type":"m","route":"","icon":"util","pname":"0","perm":"","sort":180,"show":0,"child":[
+                {
+                    "name":"mng.user","title":"用户管理","type":"c","route":"/sys/user.html","icon":"rate-half","perm":"sys/user","pname":"mng", "sort":90,"show":0,"child":[
+                        {"name":"mng.user.list","title":"查看","type":"f","route":"GET","icon":"","perm":"/user/list","pname":"mng.user", "sort":10,"show":0}
+                        ,{"name":"mng.user.save","title":"编辑","type":"f","route":"POST","icon":"","perm":"/user/save","pname":"mng.user", "sort":20,"show":0}
+                        ,{"name":"mng.user.resetpwd","title":"重置密码","type":"f","route":"POST","icon":"","perm":"/user/resetpwd","pname":"mng.user", "sort":30,"show":0}
+                    ]
+                }
+                ,{
+                    "name":"mng.role","title":"角色管理","type":"c","route":"/sys/role.html","icon":"rate-half","perm":"sys/role","pname":"mng", "sort":100,"show":0,"child":[
+                        {"name":"mng.role.list","title":"查看","type":"f","route":"GET","icon":"","perm":"/role/list","pname":"mng.role", "sort":10,"show":0}
+                        ,{"name":"mng.role.save","title":"编辑","type":"f","route":"POST","icon":"","perm":"/role/save","pname":"mng.role", "sort":20,"show":0}
+                        ,{"name":"mng.role.perm","title":"授权","type":"f","route":"GET","icon":"","perm":"/role/perm","pname":"mng.role", "sort":30,"show":0}
+                    ]
+                }
+            ]
+        }
+        ,{
+            "name":"game","title":"用户管理","type":"m","route":"","icon":"rate-half","pname":"0","perm":"","sort":90,"show":0,"child":[
+                {
+                    "name":"game.usermng","title":"平台用户","type":"c","route":"/game/usermng.html","icon":"rate-half","perm":"game/usermng","pname":"game", "sort":90,"show":0,"child":[
+                        {"name":"game.usermng.list","title":"查看","type":"f","route":"GET","icon":"","perm":"/usermng/list","pname":"game.usermng", "sort":10,"show":0}
+                    ]
+                }
+            ]
+        }
+        ,{
+            "name":"stats","title":"游戏数据","type":"m","route":"","icon":"rate-half","pname":"0","perm":"","sort":100,"show":0,"child":[
+                {
+                    "name":"stats.gdata","title":"游戏输赢","type":"c","route":"/stats/gdata.html","icon":"rate-half","perm":"stats/gdata","pname":"stats", "sort":90,"show":0,"child":[
+                        {"name":"stats.gdata.list","title":"查看","type":"f","route":"GET","icon":"","perm":"/gdata/list","pname":"stats.gdata", "sort":10,"show":0}
+                        ,{"name":"stats.gdata.win","title":"赢/输前十","type":"f","route":"POST","icon":"","perm":"/gdata/win","pname":"stats.gdata", "sort":10,"show":0}
+                    ]
+                }
+                ,{
+                    "name":"stats.daycnt","title":"每天结算","type":"c","route":"/stats/daycnt.html","icon":"rate-half","perm":"stats/daycnt","pname":"stats", "sort":100,"show":0,"child":[
+                        {"name":"stats.daycnt.list","title":"查看","type":"f","route":"GET","icon":"","perm":"/daycnt/list","pname":"stats.daycnt", "sort":10,"show":0}
+                    ]
+                }
+            ]
+        }
+        
+    ]
+}

@@ -1,0 +1,145 @@
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-body">
+      <form class="layui-form layui-card-header layuiadmin-card-header-auto">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <span class="layui-span">时间：</span>
+              <div class="layui-input-inline">
+                <input type="text" name="stime" placeholder="起始时间" autocomplete="off" class="layui-input layui-date-s">
+              </div>
+              <span class="layui-span">至：</span>
+              <div class="layui-input-inline">
+                <input type="text" name="etime" placeholder="结束时间" autocomplete="off" class="layui-input layui-date-e">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <button class="layui-btn layuiadmin-btn-admin" lay-submit="" lay-filter="LAY-app-search">
+                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+              </button>
+            </div>
+            <div class="layui-block">
+              <span class="layui-span">快速查找：</span>
+              <div class="layui-input-block">
+                  <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="0">
+                  今天
+                  </button>
+                  <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="1">
+                  昨天
+                  </button>
+                  <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="3">
+                  近三天
+                  </button>
+                  <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="7">
+                  近七天
+                  </button>
+                  <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="30">
+                  近30天
+                  </button>
+              </div>
+            </div>
+          </div>
+      </form>
+    
+      <table id="dataTable" lay-filter="dataTable"></table>
+    </div>
+  </div>
+</div>
+        <script>
+            layui.use(['layer', 'table', 'form', 'app'], function () {
+                var layer = layui.layer,
+                    table = layui.table,
+                    form = layui.form,
+                    dic = layui.app.dicData(),
+                    mark={},
+                    cl = 0,
+                    il = 0,
+                    api ={
+                        _init:function(){
+                            layui.app.itemSearch(1, false);
+                            var dateNum = {0:'s', 1: 'e'};
+                            for (var i in dateNum){
+                                //日期选择器
+                                layui.laydate.render({ 
+                                    elem: '.layui-date-'+ dateNum[i]
+                                });
+                            }
+                            layui.$.extend(layui.admin.events, api.events);
+                        },
+                        sb:function(k, v, inc){
+                          var inc = inc || 0, 
+                            cnt=0;
+                          if(k == 'svr'){
+                            cnt += v.length;
+                            layui.each(v, function(k1, v1){
+                              var col = {field: "svr_"+v1, title: dic.coinMainReason[v1], templet:'<div>{{layui.app.moneyFmt(Math.abs(d["svr_'+v1+'"]))}}</div>'};
+                              mark["svr_"+v1] = inc;
+                              h2.push(col);
+                            });
+                          }
+                          if(k == 'sub'){
+                            cnt += v.length;
+                            layui.each(v, function(k2, v2){
+                              var col = {field: "sub_"+v2, title: dic.coinSubReason[v2], width:164, templet:'<div>{{layui.app.moneyFmt(Math.abs(d["sub_'+v2+'"]))}}</div>'};
+                              h2.push(col);
+                              mark["sub_"+v2] = inc;
+                            });
+                          }
+                          return cnt;
+                        }
+                        ,win:function(d){
+                          var sum = 0;
+                          sum = Number(d.win || 0);
+                          return layui.app.moneyFmt(sum);
+                        }
+                        ,events:{
+                          quicksearch: function(e, et){
+                            layui.$.each(e.closest('.layui-input-block').children(), function(k, v){
+                              if(!layui.$(v).hasClass('layui-btn-primary')){
+                                layui.$(v).addClass('layui-btn-primary');
+                              }
+                            });
+                            layui.$(e).removeClass('layui-btn-primary');
+                            layui.app.searchForm({
+                              tblReload:'idDtable'
+                              ,fields:{quickday:e.attr('lay-day')}
+                              ,page:false
+                            });
+                            et.preventDefault();
+                            return false;
+                          }
+                        }
+                    }
+                    
+                    ,h2 = [
+                      {field: 'win', title: '系统输赢', templet:function(d){
+                          return api.win(d);
+                        }}
+                      ,{field: 'tax', title: '税收', templet:'<div>{{layui.app.moneyFmt(d.tax)}}</div>'}
+                    ];
+                    layui.each(dic.dayCoinReason.comsume, function(k, v){ //消耗
+                      cl += api.sb(k,v, 1);
+                    });
+                    layui.each(dic.dayCoinReason.issue, function(k, v){
+                      il += api.sb(k,v);
+                    });
+                    var h1 =[
+                      {field: 'day', align: 'center', title: '日期', rowspan:2},
+                      {field: 'name', align: 'center', title: '游戏概况', colspan:2},
+                      {field: 'name', align: 'center', title: '系统消耗', colspan:cl},
+                      {field: 'name', align: 'center', title: '系统发放', colspan:il},
+                    ];
+                    layui.app.renderTable(
+                        [ //表头
+                          h1,h2
+                        ],
+                        {
+                          elem: '#dataTable'
+                          , url: layui.setter.requestUri + "daycnt/list" //数据接口
+                          , page: false //开启分页
+                          , toolbar: true
+                        }
+                    );
+               api._init();
+            })
+        </script>

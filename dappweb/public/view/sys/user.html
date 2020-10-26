@@ -1,0 +1,204 @@
+<title>用户列表</title>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form lay-filter="LAY-app-search"  class="layui-form layui-form-search" >
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                      <span class="layui-span">用户名：</span>
+                      <div class="layui-input-inline">
+                        <input type="text" name="name"  autocomplete="off" class="layui-input">
+                      </div>
+                    </div>
+                    <div class="layui-inline">
+                      <button class="layui-btn layuiadmin-btn-admin" lay-submit="" lay-filter="LAY-app-search">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                      </button>
+                    </div>
+                  </div>
+            </form>
+            <table id="LAY-app-admin-user-list" lay-filter="LAY-app-admin-user-list"></table>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="toolbarUser">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" layadmin-event="renderForm" lay-subform="LAY-app-admin-user-form" lay-form="LAY-app-admin-user-form" lay-title="添加用户">添加</button>
+        <!-- <button class="layui-btn layui-btn-sm" layadmin-event="setStatus" lay-table="LAY-app-admin-user-reload" lay-url="/api/user" data-status="1">启用</button>
+        <button class="layui-btn layui-btn-sm" layadmin-event="setStatus" lay-table="LAY-app-admin-user-reload" lay-url="/api/user" data-status="0">禁用</button> -->
+    </div>
+</script>
+<script type="text/html" id="LAY-app-admin-user-bar">
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-sm" lay-event="qrcodeForm">二维码</a>
+        <a class="layui-btn layui-btn-sm" lay-event="editForm">编辑</a>
+        
+        </a>
+        <a class="layui-btn layui-btn-sm" lay-event="resetPasswd" title="重置密码">重置</a>
+    </div>
+</script>
+<script type="text/html" id="Lay-user-qrcode">
+    <div id="my-user-qrcode" style="margin:10px 0 0 20px">
+
+    </div>
+</script>
+
+<script type="text/html" id="LAY-app-admin-user-form">
+    <form class="layui-form" lay-filter="LAY-app-admin-user-form">
+        <div class="layui-form-item">
+            <input type="hidden" name="id" value="{{d.id||0}}">
+            <label class="layui-form-label">角色</label>
+            <div class="layui-input-inline">
+                <select name="roleid" lay-search lay-verify="required">
+                    <option value="">请选择</option>
+                    {{# layui.each(d.roles, function(k, v){ }}
+                    <option value="{{v.id}}"{{# if (d.roleid == v.id) { }} selected{{# } }}>{{v.cname}}</option>
+                    {{# }); }}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="username" value="{{d.username||''}}" lay-verify="required"  autocomplete="off">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">邮箱</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="email" value="{{d.email||''}}" lay-verify="required|email" placeholder="xxx@yyy.com" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">手机号</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="phone" value="{{d.phone||''}}" lay-verify="required|phone"  autocomplete="off">
+            </div>
+        </div>
+
+        {{# if(!d.id){ }}
+        <div class="layui-form-item">
+            <label class="layui-form-label">默认密码</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="password" value="QAZwsx123" >
+            </div>
+        </div>
+        {{# } }}
+        <div class="layui-form-item">
+            <a class="layui-hide layui-submit" lay-submit lay-filter="LAY-app-admin-user-form">提交</a>
+        </div>
+    </form>
+</script>
+
+<script>
+    layui.use(['app', 'qrcode'], function(app) {
+        var roles = layui.setter.dic.role,
+            status = {1:'启用', 0:'禁用'},
+            $ = layui.$,
+            form = layui.form,
+            table = layui.table,
+            admin = layui.admin,
+            QRCode = layui.qrcode,
+            events = {
+                editForm: function(d) {
+                    d.roles = roles;
+                    app.renderForm({
+                        filter: 'LAY-app-admin-user-form',
+                        title: '编辑 ' + d.name,
+                        subform: "LAY-app-admin-user-form",
+                    }, d);
+                },
+                setStatus: function(d) {
+                    app.setStatus('/api/user', {
+                        id: d.id,
+                        status: d.status == 1 ? 0 : 1
+                    });
+                },
+                qrcodeForm: function(d){
+                    var html = app.tpl("Lay-user-qrcode", {});
+                    layui.layer.open({
+                        'type':1,
+                        'title':d.username + " google验证码秘钥",
+                        'content':html,
+                        'area':['300px', '340px'],
+                        'success':function(){
+                            var qrcode = new QRCode("my-user-qrcode", {
+                                text: "otpauth://totp/qrcode.admin.com?secret=" + d.uuid,
+                                width: 256,
+                                height: 256,
+                                correctLevel : QRCode.CorrectLevel.H
+                            });
+                        }
+                    });
+                },
+                resetPasswd: function(d) {
+                    admin.confirm('确定重置【'+ d.username +'】的密码？', function() {
+                        admin.request({
+                            type:'post',
+                            url: layui.setter.requestUri + 'user/resetpwd',
+                            data: {id: d.id, username:d.username},
+                            done: function(res) {
+                                admin.popup({
+                                    content: res.msg,
+                                    time: 0,
+                                    title: '初始密码'
+                                });
+                            }
+                        });
+                    });
+                }
+            };
+        app.renderTable([
+            {field: 'id', title: '编号', sort: true},
+            {field: 'username', title: '用户名', width: 202},
+            {field: 'email', title: '邮箱', width: 202},
+            {field: 'phone', title: '电话'},
+            {field: 'uuid', title: '谷歌秘钥'},
+            {field: 'roleid', title: '角色', templet: function(d){
+                return layui.app.trans(roles, d.roleid, "id", "cname")}
+            },
+            {field: 'channel', title: '渠道', templet: function(d){return status[d.status]|| '' }},
+            {field: 'ctime', title: '添加时间',templet: function(d){return app.date(d.ctime)} ,width:200 },
+            {field: 'act',title:'操作', width: 303, toolbar: '#LAY-app-admin-user-bar'}
+        ],
+            {
+                elem: '#LAY-app-admin-user-list'
+                ,url: layui.setter.requestUri + 'user/list'
+                ,title: '用户表'
+                ,page: true //开启分页
+                ,toolbar:"#toolbarUser"
+                ,noNumbers: true
+                ,id:'LAY-app-admin-table'
+            }
+
+        );
+        table.on('tool(LAY-app-admin-user-list)', function(o) {
+            events[o.event] && events[o.event].call(this, o.data);
+        });
+        form.on('submit(LAY-app-admin-user-form)', function(d) {
+            admin.request({
+                type: 'post',
+                url: layui.setter.requestUri + 'user/save',
+                data: d.field,
+                done: function(res) {
+                    admin.popup({
+                        content: res.msg,
+                        end: app.refresh
+                    });
+                }
+            });
+            return false;
+        });
+        form.on('submit(LAY-app-search-admin-user-form)', function(d) {
+            var options={};
+                options['tblReload']="LAY-app-admin-user-reload";
+                options['fields'] = d.field;
+            app.searchForm(options);
+            return false;
+        })
+        $('button[lay-form="LAY-app-admin-user-form"]').data('roles', roles);
+        layui.app.itemSearch()
+    });
+</script>

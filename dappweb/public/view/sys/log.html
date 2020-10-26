@@ -1,0 +1,130 @@
+<title>操作日志</title>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form  class="layui-form layui-form-search" lay-filter="LAY-app-search-admin-log-form" >
+                <div class="layadmin-toolbar">
+                    用户名：
+                    <div class="layui-inline">
+                        <input class="layui-input" name="name" value="">
+                    </div>
+                    操作类型
+                    <div class="layui-inline" id="Lay-app-search-admin-log-form-sel">
+                        <select name="type" lay-search lay-verify="required">
+                            <option value="">全部</option>
+                            {{# layui.each(d.types, function(k, v){ }}
+                            <option value="{{k}}">{{v}}</option>
+                            {{# }); }}
+                        </select>
+                    </div>
+                    <button class="layui-btn layui-btn-primary layui-btn-sm" lay-submit lay-filter="LAY-app-search-admin-log-form" >搜索</button>
+                </div>
+            </form>
+            <table id="LAY-app-admin-log-list" lay-filter="LAY-app-admin-log-list"></table>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="LAY-app-admin-log-bar">
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="editForm">查看</a>
+    </div>
+</script>
+<script type="text/html" id="LAY-app-admin-log-form">
+    <form class="layui-form" lay-filter="LAY-app-admin-log-form">
+        <input type="hidden" name="id" value="{{d.id||0}}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">操作类型</label>
+            <div class="layui-input-block">
+                <select name="role" lay-search lay-verify="required">
+                    {{# layui.each(d.types, function(k, v){ }}
+                    <option value="{{k}}"{{# if (d.type == k) { }} selected{{# } }}>{{v}}</option>
+                    {{# }); }}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="text" name="name" value="{{d.name||''}}" lay-verify="required"  autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">IP</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="text"  name="ip" value="{{d.ip||''}}" >
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">浏览器</label>
+            <div class="layui-input-block">
+                <textarea name="browser" placeholder="请输入" class="layui-textarea">{{d.browser||''}}</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">详情</label>
+            <div class="layui-input-block">
+                <textarea name="note" placeholder="请输入" class="layui-textarea">{{d.note||''}}</textarea>
+            </div>
+        </div>
+
+    </form>
+</script>
+
+<script>
+    layui.use('app', function(app) {
+        var types = {1:'登陆', 2:'授权',3:'转币',4:'封号'},
+            $ = layui.$,
+            form = layui.form,
+            table = layui.table,
+            admin = layui.admin,
+            events = {
+                editForm: function(d) {
+                    d.types = types;
+                    app.renderForm({
+                        filter: 'LAY-app-admin-log-form',
+                        title: '查看 ' + d.name,
+                    }, d);
+                }
+            };
+
+        app.renderTable([
+                {type: 'checkbox'},
+                {field: 'id', title: '编号', sort: true},
+                {field: 'name', title: '用户名'},
+                {field: 'type', title: '操作类型', templet: function(d){return types[d.type] || ''}},
+                {field: 'ip', title: 'ip', templet: function(d){ return app.int2ip(d.ip)}},
+                {field: 'browser', title: '浏览器', width: 202},
+                {field: 'note', title: '详情', width: 302},
+                {field: 'addTime', title: '时间',templet: function(d){return app.date(d.addTime)} ,width:200 },
+                {field: 'act',title:'操作',toolbar: '#LAY-app-admin-log-bar'}
+            ],
+            {
+                elem: '#LAY-app-admin-log-list'
+                ,url: '/api/log'
+                ,title: '用户表'
+                ,page: true //开启分页
+                ,toolbar:"#toolbarUser"
+                ,id:'LAY-app-admin-user-reload'
+            }
+
+        );
+        table.on('tool(LAY-app-admin-log-list)', function(o) {
+            events[o.event] && events[o.event].call(this, o.data);
+        });
+
+        form.on('submit(LAY-app-search-admin-log-form)', function(d) {
+            var options={};
+            options['tblReload']="LAY-app-admin-user-reload";
+            options['fields'] = d.field;
+            app.searchForm(options);
+            return false;
+        })
+        var tpl = $("#Lay-app-search-admin-log-form-sel").html(),
+            html = layui.laytpl(tpl).render({types:types});
+        $("#Lay-app-search-admin-log-form-sel").html(html);
+        form.render("select");
+        $('button[lay-form="LAY-app-admin-log-form"]').data('types', types);
+    });
+</script>

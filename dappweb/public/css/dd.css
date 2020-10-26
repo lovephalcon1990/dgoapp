@@ -1,0 +1,63 @@
+/** layuiAdmin.std-v1.0.0 LPPL License By http://www.layui.com/admin/ */
+
+.layui-form-item .layui-span {
+    display: block;
+    float: left;
+    line-height: 37px;
+}
+
+.layui-a {
+    color: blue !important;
+    text-decoration: underline !important;
+}
+
+.layui-form .layui-form-item:first-child {
+    margin-top: 10px;
+}
+
+.layui-table-cell {
+    height: 32px !important;
+    line-height: 32px !important;
+}
+
+.layui-btn-group .layui-btn {
+    margin-right: 5px !important;
+}
+
+.layui-btn-group .layui-btn:last-child {
+    margin-right: 0 !important;
+}
+
+.layui-coin-text {
+    border: none;
+    background-color: #f2f2f2;
+    font-size: 14px;
+    cursor: text;
+}
+
+.layui-upload-img {
+    width: 92px;
+    height: 92px;
+    margin: 0 10px 10px 0;
+}
+
+.layui-form .layui-input-inline {
+    width: 290px !important;
+}
+
+.layui-card-body .layui-input-inline {
+    width: 190px !important;
+}
+
+.layui-layer-btn {
+    background-color: #F8F8F8;
+}
+
+.layui-form-item .layui-word-aux {
+    padding-left: 110px !important;
+    color: #ec2b55 !important;
+}
+
+.layui-form-item .layui-block{
+    margin-top:10px;
+}

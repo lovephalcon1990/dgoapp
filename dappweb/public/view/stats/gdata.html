@@ -1,0 +1,205 @@
+<title>游戏输赢</title>
+<div class="layui-fluid">
+    <div class="layui-card">
+    <div class="layui-card-body">
+    <form  class="layui-form layui-form-search" lay-filter="LAY-app-search-admin-menu-form" >
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <span class="layui-span">≥起始时间：</span>
+                <div class="layui-input-inline">
+                <input type="text" name="stime" placeholder="起始时间" autocomplete="off" class="layui-input layui-date-s">
+                </div>
+                <span class="layui-span">≤结束时间：</span>
+                <div class="layui-input-inline">
+                <input type="text" name="etime" placeholder="结束时间" autocomplete="off" class="layui-input layui-date-e">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn layuiadmin-btn-admin" lay-submit="" lay-filter="LAY-app-search">
+                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                </button>
+            </div>
+            <div class="layui-block">
+                <span class="layui-span">快速查找：</span>
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="0">
+                    今天
+                    </button>
+                    <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="1">
+                    昨天
+                    </button>
+                    <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="3">
+                    近三天
+                    </button>
+                    <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="7">
+                    近七天
+                    </button>
+                    <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="30">
+                    近30天
+                    </button>
+                </div>
+            </div>
+            </div>
+    </form>
+    <table id="dataTable" lay-filter="dataTable"></table>
+    </div></div>
+</div>
+    
+<script type="text/html" id="default">
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-sm" lay-event="win" lay-act="1">赢前10</a>
+        <a class="layui-btn layui-btn-sm" lay-event="win" lay-act="0">输前10</a>
+    </div>
+  </script>
+  <script type="text/html" id="layui-table-form-filter">
+    <div class="layui-body-content" style="margin-left:10px; margin-right:10px;">
+      <table class="layui-table" id="layui-table-top-tpl">
+        <thead>
+          <th>序号</th>
+          <th>玩家ID</th>
+          <th>玩家昵称</th>
+          <th>输赢金币</th>
+        </thead>
+        <tbody>
+          {{# if(d.list != undefined){  layui.each(d.list, function(k,v){ }}
+            <tr>
+              <td>{{k+1}}</td>
+              <td>{{v.uid}}</td>
+              <td>{{ d.userinfo[v.uid] != undefined ? d.userinfo[v.uid].name : "" }}</td>
+              <td>{{layui.app.moneyFmt(v.win)}}</td>
+            </tr>
+          {{# })} }}
+        </tbody>
+      </table>
+    </div>
+  </script>
+<script>
+    layui.use(['layer', 'table', 'form', 'app'], function () {
+    var layer = layui.layer,
+        table = layui.table,
+        form = layui.form,
+        $ = layui.$,
+        cond = {},
+        api ={
+            _init:function(){
+                form.on('submit(LAY-app-search)', function (data) {
+                    var e = layui.$(this),
+                        fp = e.closest('.layui-inline'),
+                        qs = fp.next('.layui-block').find('.layui-input-block');
+                    layui.$.each(qs.children(), function (k, v) {
+                        if (!layui.$(v).hasClass('layui-btn-primary')) {
+                            layui.$(v).addClass('layui-btn-primary');
+                        }
+                    });
+                    if(!data.field['stime'] || !data.field['etime']){
+                    layer.msg("起始时间或结束时间不能为空!");
+                    return false;
+                    }
+                    data.field["quickday"] = null;
+                    table.reload('idDtable', {
+                        page: {
+                            curr: 1,
+                        },
+                        where: data.field
+                    });
+                    cond = data.field;
+                    return false;
+                });
+                var dateNum = {0:'s', 1: 'e'};
+                for (var i in dateNum){
+                    //日期选择器
+                    layui.laydate.render({ 
+                        elem: '.layui-date-'+ dateNum[i]
+                    });
+                }
+                layui.$.extend(layui.admin.events, api.events);
+
+                table.on('tool(dataTable)', function(obj){
+                api[obj.event] != undefined &&  api[obj.event].call(this, obj.data);
+                });
+            },
+            events:{
+                quicksearch: function(e, et){
+                    var day = e.attr('lay-day');
+                    layui.$.each(e.closest('.layui-input-block').children(), function(k, v){
+                        if(!layui.$(v).hasClass('layui-btn-primary')){
+                        layui.$(v).addClass('layui-btn-primary');
+                        }
+                    });
+                    layui.$(e).removeClass('layui-btn-primary');
+                    cond = {quickday:day};
+                    layui.app.searchForm({
+                        tblReload:'idDtable'
+                        ,fields:cond
+                    });
+                    et.preventDefault();
+                    return false;
+                }
+                
+            }
+            ,win: function(o){
+                var act = $(this).attr('lay-act'),
+                    stime = $('input[name="stime"]').val(),
+                    etime = $('input[name="etime"]').val(),
+                    layIndex = layui.layer.load();
+                cond['act'] = act;
+                cond['gameid'] = o.gameid;
+                layui.admin.request({
+                    url:layui.setter.requestUri + 'gdata/win',
+                    data: {act:act, gameid:o.gameid, stime:stime, etime:etime},
+                    type:"post",
+                    success: function(res){
+                        layui.layer.close(layIndex);
+                        var title=['输前10', '赢前10'],
+                        apend = '';
+                        rtitle= title[act] || '赢前10';
+                        if(stime){
+                            apend = stime + ' ≤ 时间 ≤';
+                        }
+                        if(etime){
+                            apend += etime;
+                        }
+                        layui.app.renderForm({
+                            filter: "layui-table-form-filter"
+                            ,title: rtitle + '  '+ apend
+                            ,area: ["600px", "520px"]
+                            ,btn:false
+                            ,done:function(){
+                            
+                            // api.afterRender(cond);
+                            }
+                        }, res.data);
+                    }
+                });
+            }
+        };
+        layui.app.renderTable(
+            [ //表头
+                {field: 'gameid', title: '游戏id'}
+                , {field: 'gamename', title: '游戏名称', templet:'<div>{{layui.app.dicData().newGameName[d.gameid]}}</div>'}
+                , {field: 'consume', title: '玩家消耗', templet:'<div>{{layui.app.moneyFmt(d.consume)}}</div>'}
+                , {field: 'tax', title: '税收', templet:'<div>{{layui.app.moneyFmt(d.tax)}}</div>'}
+                , {field: 'win', title: '系统输赢', width:168, templet:'<div>{{layui.app.moneyFmt(d.win)}}</div>'}
+                ,{title:'操作', width:178, toolbar:"#default"}
+            ],
+            {
+                elem: '#dataTable'
+                , url: layui.setter.requestUri + 'gdata/list' //数据接口
+                , page: false //开启分页
+                , toolbar: true
+                , noNumbers: true
+                , done: function(res, curr, count){
+                    var etarr = res.ext;
+                    if(typeof etarr == "object"){
+                    layui.each(etarr, function(k,v){
+                        if(v){
+                        layui.$('input[name="'+k+'"]').val(v);
+                        }
+                    })
+                    }
+                }
+            }
+        );
+        api._init();
+    })
+</script>

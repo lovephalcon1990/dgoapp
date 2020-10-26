@@ -1,0 +1,250 @@
+<title>角色管理</title>
+<style>
+    .layui-form-margin40{
+        margin-top: 10px;
+        margin-left: 40px;
+    }
+    #LAY-auth-tree-index .jstree-container-ul .jstree-node {
+        display: block;
+        clear: both;
+    }
+
+    #LAY-auth-tree-index .jstree-leaf {
+        float: left;
+        margin-left: 0;
+        padding-left: 24px;
+        min-width: 80px;
+        clear: none;
+        color: #777;
+    }
+    #LAY-auth-tree-index .jstree-leaf:not(:first-child) {
+        float: left;
+        background: none;
+        margin-left: 0;
+        min-width: 80px;
+        clear: none;
+    }
+
+    #LAY-auth-tree-index .jstree-last {
+        background-image: url(public/css/32px.png);
+        background-position: -292px -4px;
+        background-repeat: repeat-y;
+    }
+    #LAY-auth-tree-index .jstree-leaf > .jstree-icon, #LAY-auth-tree-index .jstree-leaf .jstree-themeicon {
+        display: none;
+    }
+
+    #LAY-auth-tree-index .jstree-themeicon {
+        display: none;
+    }
+
+    #LAY-auth-tree-index .jstree-children:before, #LAY-auth-tree-index .jstree-children:after {
+        content: " ";
+        display: table;
+    }
+
+    #LAY-auth-tree-index .jstree-children:after {
+        clear: both;
+    }
+
+</style>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form  class="layui-form layui-form-search">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                      <span class="layui-span">角色名：</span>
+                      <div class="layui-input-inline">
+                        <input type="text" name="name"  autocomplete="off" class="layui-input">
+                      </div>
+                    </div>
+                    <div class="layui-inline">
+                      <button class="layui-btn layuiadmin-btn-admin" lay-submit="" lay-filter="LAY-app-search">
+                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                      </button>
+                    </div>
+                  </div>
+            </form>
+            <table id="LAY-app-admin-perm-list" lay-filter="LAY-app-admin-perm-list"></table>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="toolbar-admin-perm">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-primary layui-btn-sm" layadmin-event="renderForm" lay-form="LAY-app-admin-perm-form" lay-title="添加角色">添加</button>
+    </div>
+</script>
+<script type="text/html" id="LAY-app-admin-perm-bar">
+    <div class="layui-btn-group">
+        {{# if(d.id!=1){ }}<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="renderPage">授权</a>{{# } }}
+    </div>
+</script>
+
+<script type="text/html" id="LAY-app-admin-perm-form">
+    <form class="layui-form" lay-filter="LAY-app-admin-perm-form">
+        <div class="layui-form-item">
+            <input type="hidden" name="id" value="{{d.id||0}}">
+            <label class="layui-form-label">权限英文名</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="name" value="{{d.name||''}}" lay-verify="required"  autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限中文名</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="cname" value="{{d.cname||''}}" lay-verify="required"  autocomplete="off">
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <a class="layui-hide layui-submit" lay-submit lay-filter="LAY-app-admin-perm-form">提交</a>
+        </div>
+    </form>
+</script>
+<script type="text/html" id="LAY-app-admin-role-perm-form">
+    <form class="layui-form" lay-filter="LAY-app-admin-role-perm-form" >
+        <input type="hidden" name="roleid" value="{{d.id||0}}">
+        <div class="layui-form-item layui-form-margin40">
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="checkall" >全选</button>
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="uncheckall" >全不选</button>
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="showall" >全部展开</button>
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="closeall">全部隐藏</button>
+        </div>
+        <div class="layui-form-item ">
+            <div class="layui-card-header">权限:</div>
+            <div id="LAY-auth-tree-index" class="layui-form-margin40"></div>
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-submit layui-hide"  lay-submit lay-filter="LAY-app-admin-role-perm-form">提交</button>
+        </div>
+    </form>
+</script>
+<script>
+    layui.use(['app', 'jstree'], function(app) {
+        var form = layui.form,
+            table = layui.table,
+            admin = layui.admin,
+            events = {
+                editForm: function(d) {
+                    app.renderForm({
+                        filter: 'LAY-app-admin-perm-form',
+                        title: '编辑 ' + d.name,
+                    }, d);
+                },
+                renderPage: function(d){
+                    app.renderForm({
+                        title: '权限管理 '+ d.name,
+                        filter: 'LAY-app-admin-role-perm-form',
+                        subform: 'LAY-app-admin-role-perm-form',
+                        area: ["60%","80%"],
+                        done:  null
+                    }, d);
+                    ajaxAfterRunScript(d.id);
+                }
+
+            };
+
+        app.renderTable([
+                {field: 'id', title: '编号', sort: true},
+                {field: 'name', title: '名称', width: 202},
+                {field: 'cname', title: '中文名'},
+                {field: 'addTime', title: '添加时间',templet: function(d){return app.date(d.ctime)} ,width:200 },
+                {field: 'act',title:'操作',toolbar: '#LAY-app-admin-perm-bar'}
+            ],
+            {
+                elem: '#LAY-app-admin-perm-list'
+                ,url: layui.setter.requestUri +'role/list'
+                ,noNumbers: true
+                ,title: '菜单表'
+                ,page: true //开启分页
+                ,toolbar:"#toolbar-admin-perm"
+                ,id:'table-admin-role'
+            }
+
+        );
+        table.on('tool(LAY-app-admin-perm-list)', function(o) {
+            events[o.event] && events[o.event].call(this, o.data);
+        });
+        form.on('submit(LAY-app-admin-perm-form)', function(d) {
+            admin.request({
+                type: 'post',
+                url: layui.setter.requestUri+'role/save',
+                data: d.field,
+                done: function(res) {
+                    admin.popup({
+                        content: res.msg,
+                        end: app.refresh
+                    });
+                }
+            });
+            return false;
+        });
+        form.on('submit(LAY-app-search)', function(d) {
+            var options={};
+            options['tblReload']="table-admin-role";
+            options['fields'] = d.field;
+            app.searchForm(options);
+            return false;
+        })
+
+
+
+    });
+    function ajaxAfterRunScript(roleId){
+        var admin = layui.admin,
+            app = layui.app,
+            dst ="#LAY-auth-tree-index",
+            $ = layui.$,
+            form = layui.form,
+            events={
+                checkall:function(){
+                    $(dst).jstree('check_all');
+                },
+                uncheckall:function(){
+                    $(dst).jstree('uncheck_all');
+                },
+                showall:function(){
+                    $(dst).jstree('open_all');
+                },
+                closeall:function(){
+                    $(dst).jstree('close_all');
+                }
+            };
+
+        admin.request({
+            type:"get",
+            url: layui.setter.requestUri +'role/perm',
+            data:{roleid:roleId},
+            dataType: 'json',
+            success: function(ret) {
+                app.jstree('LAY-auth-tree-index', {core:{data:ret.data}});
+            }
+        });
+        $.each( events, function( key, fun ) {
+            $("#"+key).click(fun);
+        });
+
+        // 表单提交样例
+        form.on('submit(LAY-app-admin-role-perm-form)', function(obj){
+            //读取选中的条目
+            if ($("#LAY-auth-tree-index").size() > 0) {
+                var jt = $("#LAY-auth-tree-index").jstree("get_all_checked");
+                obj.field.perms = jt;
+            }
+            admin.request({
+                type:'post',
+                url: layui.setter.requestUri + 'role/saveperm',
+                dataType: 'json',
+                data: obj.field,
+                success: function(res){
+                    admin.popup({
+                        content: res.msg,
+                        end: app.refresh
+                    });
+                }
+            });
+            return false;
+        });
+    }
+</script>

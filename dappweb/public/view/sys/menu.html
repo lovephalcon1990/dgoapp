@@ -1,0 +1,176 @@
+<title>菜单管理</title>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form  class="layui-form layui-form-search" lay-filter="LAY-app-search-admin-menu-form" >
+                <div class="layadmin-toolbar" style="margin-bottom: 10px;">
+                    菜单名：
+                    <div class="layui-inline">
+                        <input class="layui-input" name="title" value="">
+                    </div>
+                     PID：
+                    <div class="layui-inline">
+                        <input class="layui-input" name="pid" value="">
+                    </div>
+                    <button class="layui-btn layui-btn-primary layui-btn-sm" lay-submit lay-filter="LAY-app-search-admin-menu-form" >搜索</button>
+                </div>
+            </form>
+            <table id="LAY-app-admin-menu-list" lay-filter="LAY-app-admin-menu-list"></table>
+        </div>
+    </div>
+</div>
+<script type="text/html" id="toolbar-admin-menu">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-primary layui-btn-sm" layadmin-event="renderForm" lay-form="LAY-app-admin-menu-form" lay-title="添加用户">添加</button>
+    </div>
+</script>
+<script type="text/html" id="LAY-app-admin-menu-bar">
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="editForm">编辑</a>
+    </div>
+</script>
+
+<script type="text/html" id="LAY-app-admin-menu-switchTpl">
+    <!-- 这里的 checked 的状态只是演示 -->
+    <input type="checkbox" name="isShow" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="isShowAct" {{ d.isShow == 1 ? 'checked' : '' }}>
+</script>
+
+<script type="text/html" id="LAY-app-admin-menu-form">
+    <form class="layui-form" lay-filter="LAY-app-admin-menu-form">
+        <div class="layui-form-item">
+            <input type="hidden" name="id" value="{{d.id||0}}">
+            <label class="layui-form-label">菜单名称</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="text" name="title" value="{{d.title||''}}" lay-verify="required"  autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">PID</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="input" name="pid" value="{{d.pid||0}}" >
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">跳转地址</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="input" name="jump" value="{{d.jump||''}}" >
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">图标</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="text" name="icon" value="{{d.icon||''}}"  autocomplete="off">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限码</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="text" name="code" value="{{d.code||''}}"  autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否显示</label>
+            <div class="layui-input-block">
+                <input type="radio" name="isShow" value="1" title="是" {{# if(d.isShow != 0 ){ }}checked=""{{# }}}>
+                <input type="radio" name="isShow" value="0" title="否" {{# if(d.isShow == 0 ){ }}checked=""{{# }}}>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-block">
+                <input class="layui-input" type="text" name="sort" value="{{d.sort||''}}"  autocomplete="off">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <a class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-app-admin-menu-form">提交</a>
+        </div>
+    </form>
+</script>
+
+<script>
+    layui.use('app', function(app) {
+        var form = layui.form,
+            table = layui.table,
+            admin = layui.admin,
+            events = {
+                editForm: function(d) {
+                    app.renderForm({
+                        filter: 'LAY-app-admin-menu-form',
+                        title: '编辑 ' + d.title,
+                    }, d);
+                }
+
+            };
+
+        app.renderTable([
+                {type: 'checkbox'},
+                {field: 'id', title: '编号', sort: true},
+                {field: 'pid', title: 'PID'},
+                {field: 'title', title: '名称', width: 202},
+                {field: 'jump', title: '跳转地址', width: 202},
+                {field: 'icon', title: '图标', templet: '<div><i class="layui-icon layui-icon-{{d.icon || ""}}"></i></div>'},
+                {field: 'code', title: '权限码'},
+                {field: 'isShow', title: '是否显示', templet: '#LAY-app-admin-menu-switchTpl', unresize: true},
+                {field: 'sort', title: '排序'},
+                {field: 'addTime', title: '添加时间',templet: function(d){return app.date(d.addTime)} ,width:200 },
+                {field: 'act',title:'操作',toolbar: '#LAY-app-admin-menu-bar'}
+            ],
+            {
+                elem: '#LAY-app-admin-menu-list'
+                ,url: '/api/nav/list'
+                ,title: '菜单表'
+                ,page: true //开启分页
+                ,toolbar:"#toolbar-admin-menu"
+                ,id:'table-admin-menu'
+            }
+
+        );
+        //监听显示操作
+        form.on('switch(isShowAct)', function(obj){
+            admin.request({
+                type: 'post',
+                url: 'api/nav',
+                data: {id:this.value,isShow: obj.elem.checked ? 1 : 0},
+                done: function(res) {
+                    admin.popup({
+                        content: res.msg,
+                    });
+                }
+            });
+            //同步更新数据表格缓存值
+            // obj.update({
+            //     isShow: obj.elem.checked ? 1 : 0
+            // });
+            return false;
+        });
+
+        table.on('tool(LAY-app-admin-menu-list)', function(o) {
+            events[o.event] && events[o.event].call(this, o.data);
+        });
+        form.on('submit(LAY-app-admin-menu-form)', function(d) {
+            admin.request({
+                type: 'post',
+                url: 'api/nav',
+                data: d.field,
+                done: function(res) {
+                    admin.popup({
+                        content: res.msg,
+                        end: app.refresh
+                    });
+                }
+            });
+            return false;
+        });
+        form.on('submit(LAY-app-search-admin-menu-form)', function(d) {
+            var options={};
+            options['tblReload']="table-admin-menu";
+            options['fields'] = d.field;
+            app.searchForm(options);
+            return false;
+        })
+
+    });
+</script>

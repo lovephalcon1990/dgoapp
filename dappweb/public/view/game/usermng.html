@@ -1,0 +1,256 @@
+<title>平台用户</title>
+<style>
+.layui-mng .layui-table-box .layui-table-body{
+  height: 580px !important ;
+  overflow: scroll;
+}
+</style>
+<div class="layui-fluid layui-mng">
+  <div class="layui-card">
+    <div class="layui-card-body">
+      <form lay-filter="LAY-app-search">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <span class="layui-span">关键字：</span>
+            <div class="layui-input-inline">
+              <input type="text" name="uname" placeholder="uid、用户昵称" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+          <span class="layui-span">俱乐部：</span>
+            <div class="layui-input-inline">
+              <input type="text" name="club" placeholder="请输入俱乐部ID" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <span class="layui-span">注册地址：</span>
+            <div class="layui-input-inline">
+              <input type="text" name="cliip" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <span class="layui-span">登录地址：</span>
+            <div class="layui-input-inline">
+              <input type="text" name="logcliip" placeholder="请输入" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <span class="layui-span">时间：</span>
+            <div class="layui-input-inline">
+              <input type="text" name="stime" placeholder="起始时间" autocomplete="off" class="layui-input layui-date-s">
+            </div>
+            <span class="layui-span">至：</span>
+            <div class="layui-input-inline">
+              <input type="text" name="etime" placeholder="结束时间" autocomplete="off" class="layui-input layui-date-e">
+            </div>
+          </div>
+          <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-admin" lay-submit="" lay-filter="LAY-app-search">
+              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+          </div>
+          <div class="layui-block">
+            <span class="layui-span">快速查找：</span>
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="0">
+                今天
+                </button>
+                <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="1">
+                昨天
+                </button>
+                <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="3">
+                近三天
+                </button>
+                <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="7">
+                近七天
+                </button>
+                <button class="layui-btn layui-btn-primary" layadmin-event="quicksearch" lay-day="30">
+                近30天
+                </button>
+            </div>
+          </div>
+        </div>
+      </form>
+        <table id="dataTable" lay-filter="dataTable"></table>
+    </div>
+  </div>
+</div>
+    <script type="text/html" id="ban-form">
+    <form class="layui-form" lay-filter="LAY-app-form">
+        <div class="layui-form-item">
+            <input type="hidden" name="opertype" value="1" >
+            <label class="layui-form-label">游戏ID</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="uid" value="{{d.uid||''}}" lay-verify="required"  autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">封号时长</label>
+            <div class="layui-input-inline">
+                {{ layui.app.renderFormSelHtml(layui.app.dicData().useroper.areatime, 'doareatime')}}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">封号原因</label>
+            <div class="layui-input-inline">
+                {{ layui.app.renderFormSelHtml(layui.app.dicData().useroper.closeacc, 'reason')}}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-inline">
+                <textarea class="layui-textarea" name="remark"  autocomplete="off"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item layui-hide" >
+            <button class="layui-btn layui-submit" lay-submit lay-filter="LAY-app-form">提交</button>
+        </div>
+    </form>
+    </script>
+    <script type="text/html" id="jinyan-form">
+      <form class="layui-form" lay-filter="LAY-app-jinyan-form">
+        <div class="layui-form-item">
+            <input type="hidden" name="opertype" value="4" >
+            <label class="layui-form-label">游戏ID</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="text" name="uid" value="{{d.uid||''}}" lay-verify="required"  autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">禁言时长</label>
+            <div class="layui-input-inline">
+                {{ layui.app.renderFormSelHtml(layui.app.dicData().useroper.jinyantime, 'doareatime')}}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">禁言原因</label>
+            <div class="layui-input-inline">
+                {{ layui.app.renderFormSelHtml(layui.app.dicData().useroper.jinyanacc, 'reason')}}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-inline">
+                <textarea class="layui-textarea" name="remark"  autocomplete="off"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item layui-hide" >
+            <button class="layui-btn layui-submit" lay-submit lay-filter="LAY-app-jinyan-form">提交</button>
+        </div>
+    </form>
+    </script>
+
+<script>
+    layui.use(['layer', 'table', 'form', 'app'], function () {
+        var layer = layui.layer,
+            table = layui.table,
+            form = layui.form,
+            dic = layui.app.dicData(),
+            api ={
+                _init:function(){
+                    // layui.app.renderFormSel(dic.channel, 'Lay-app-sel-channel', 'channel');
+                    // layui.app.renderFormSel(dic.isTrue, 'Lay-app-sel-robot', 'isrobot');
+                    
+                    form.render("select");
+                    var dateNum = {0:'s', 1: 'e'};
+                    for (var i in dateNum){
+                        //日期选择器
+                        layui.laydate.render({ 
+                            elem: '.layui-date-'+ dateNum[i]
+                        });
+                    }
+                    layui.app.itemSearch(1);
+                    form.on('submit(LAY-app-form)',function(data){
+                      var that = layui.$(this);
+                      layui.admin.req({
+                        url:"/admin/game/usermng/oper",
+                        data:data.field,
+                        type:"post",
+                        success: function(res){
+                          layer.msg(res.msg);
+                          layui.app.layerClose(that);
+                          table.reload('idDtable');
+                        }
+                      });
+                      return false;
+                    });
+                    layui.$.extend(layui.admin.events, api.events);
+                },
+                events:{
+                  quicksearch: function(e, et){
+                    layui.$.each(e.closest('.layui-input-block').children(), function(k, v){
+                      if(!layui.$(v).hasClass('layui-btn-primary')){
+                        layui.$(v).addClass('layui-btn-primary');
+                      }
+                    });
+                    layui.$(e).removeClass('layui-btn-primary');
+                    layui.app.searchForm({
+                      tblReload:'idDtable'
+                      ,fields:{quickday:e.attr('lay-day')}
+                    });
+                    et.preventDefault();
+                    return false;
+                  }
+                  ,showBig(e, et){
+                    var html = '',
+                        av = e.data('val');
+                        
+                    if(!av){
+                      return false;
+                    }
+                    if(av.indexOf("thirdwx") !== -1){
+                      html = '<img height="517" src="'+ av.substr(0, av.lastIndexOf("/")) + '/0' + '"/>'
+                    }else{
+                      html = '<img height="517" src="'+ av + '"/>'
+                    }
+                    
+                    layer.open({
+                      type: 1,
+                      title:'预览大图',
+                      content: html,
+                      area:["517px", "560px"]
+                    });
+                    et.preventDefault();
+                    return false;
+                  }
+                }
+            };
+            layui.app.renderTable(
+                [ //表头
+                /* {checkbox: true, fixed: true} */
+                    {field: 'uid', title: '用户ID', templet:'<div>{{layui.app.uidjump(d)}}</div>'}
+                    , {field: 'status', title: '状态', templet: '<div><a class="layui-a"'+
+                      'layadmin-event="renderForm" data-uid="{{d.uid}}" lay-area="500px, 400px" lay-form="ban-form" lay-title="封号" '+
+                      'lay-done="layui.form.render()" >{{layui.app.state(d.banflag, "有效|封号")}} </a></div>'}
+                    , {field: 'name', title: '昵称'}
+                    , {field: 'iuid', title: '邀请者ID'}
+                    // , {field: 'channel', title: '注册来源', templet: '<div>{{layui.app.dicData().channel[d.channel]}}</div>'}
+                    // , {field: 'isrobot', title: '是否机器人', templet: '<div>{{layui.app.robot(d.isrobot)}}</div>'}
+                    , {field: 'sex', title: '性别', templet: '<div>{{layui.app.sex(d.sex)}}</div>'}
+                    , {field: 'avatar', title: '头像', templet: '<div><a layadmin-event="showBig" data-val="{{d.avatar}}">{{layui.app.cmsImg(d.avatar, 40)}}</a></div>'}
+                    , {field: 'coinbalance', title: '携带金币', templet: '<div>{{layui.app.moneyFmt(d.coinbalance)}}</div>'}
+                    , {field: 'bankbalance', title: '银行金币', templet: '<div>{{layui.app.moneyFmt(d.bankbalance)}}</div>'}
+                    , {field: 'gamecnt', title: '总局数'}
+                    , {field: 'givecoin', title: '赠送总额', templet: '<div>{{layui.app.moneyFmt(d.givecoin)}}</div>'}
+                    , {field: 'receivecoin', title: '接受总额', templet: '<div>{{layui.app.moneyFmt(d.receivecoin)}}</div>'}
+                    , {field: 'pid', title: '俱乐部ID'}
+                    , {field: 'clubname', title: '俱乐部昵称'}
+                    , {field: 'cliip', title: '注册IP', templet:'<div>{{layui.app.int2ip(d.cliip)}}</div>'}
+                    , {field: 'curip', title: '最近登录IP', templet:'<div>{{layui.app.int2ip(d.curip)}}</div>'}
+                    , {field: 'logincnt', title: '登录次数'}
+                    , {field: 'curlogintime', title: '最近登录时间', templet:'<div>{{layui.app.date(d.curlogintime, "yyyy-MM-dd HH:mm:ss")}}</div>'}
+                    , {field: 'regat', title: '注册时间', templet:'<div>{{layui.app.date(d.regat, "yyyy-MM-dd HH:mm:ss")}}</div>'}
+                    , {field: 'os', title: '登录平台', templet:'<div>{{layui.app.state(d.os, "安卓|iOS")}}</div>'}
+                    // ,{title:'操作', toolbar:"#default"}
+                ],
+                {
+                    elem: '#dataTable'
+                    , url: layui.setter.requestUri + "usermng/list" //数据接口
+                    , page: true //开启分页
+                    , toolbar: true
+                    , id: 'idDtable'
+                }
+            );
+        api._init();
+    })
+</script>

@@ -1,0 +1,59 @@
+<title>修改密码</title>
+<div class="layui-fluid">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>修改密码</legend>
+    </fieldset>
+    <form class="layadmin-user-login-body layui-form" method="post">
+        <div class="layui-form-item">
+            <label class="layui-form-label">原密码</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="password" name="passwd" lay-verify="passwd" placeholder="原密码" autocomplete="new-password">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新密码</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="password" name="newPasswd" lay-verify="passwd" placeholder="新密码" autocomplete="new-password">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认密码</label>
+            <div class="layui-input-inline">
+                <input class="layui-input" type="password" name="surePasswd" placeholder="确认密码" autocomplete="new-password">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+            <div class="layui-input-inline">
+                <a class="layui-btn " lay-submit lay-filter="LAY-app-admin-passwd-form">提交</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    layui.use(['admin', 'form'], function(passwd, admin) {
+        var form = layui.form,
+            admin = layui.admin;
+        form.on('submit(LAY-app-admin-passwd-form)', function(d) {
+            if (d.field.newPasswd != d.field.surePasswd) {
+                admin.error('新密码和确认密码不一致');
+                return false;
+            }
+            admin.request({
+                url: layui.setter.requestUri + 'user/setpwd',
+                data: d.field,
+                type: "post",
+                done: function(res) {
+                    admin.popup({
+                        content: res.msg,
+                        end: function() {
+                            location.hash = '/';
+                        }
+                    });
+                }
+            });
+            return false;
+        });
+    });
+</script>

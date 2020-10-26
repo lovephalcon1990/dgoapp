@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>DZPK数据后台</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="public/css/layui.css?v=1.0.0" media="all">
+  <link rel="stylesheet" href="public/css/admin.css?v=1.0.4" media="all">
+  <link rel="stylesheet" href="public/css/dd.css?v=1.0.5" media="all">
+  <link rel="stylesheet" href="public/css/tpl.css?v=1.0.0" media="all">
+</head>
+<body>
+  <div id="LAY_app"></div>
+  <script src="public/layui.js?v=1.0.0"></script>
+  <script>
+  layui.config({
+    base: './public/' //指定 layuiAdmin 项目路径
+    ,version: '1.0.228'
+  }).use('index',function(){
+    var layer = layui.layer, admin = layui.admin;
+  });
+  </script>
+</body>
+</html>

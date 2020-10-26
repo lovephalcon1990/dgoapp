@@ -1,0 +1,36 @@
+settings:
+  application:
+    cpdz: http://dzpkdev.com/cpapi/
+    dblen: 2
+    domain: 192.168.31.153:8081
+    host: 0.0.0.0
+    ishttps: false
+    mode: dev
+    name: dataApp
+    port: "8082"
+    readtimeout: 1
+    writertimeout: 2
+  database:
+    db1:
+      dbtype: mysql
+      host: 192.168.31.151
+      name: aiwan_admin
+      password: root
+      port: 3306
+      username: root
+    db2:
+      dbtype: mysql
+      host: 192.168.31.151
+      name: aiwan_stats
+      password: root
+      port: 3306
+      username: root
+  jwt:
+    secret: dadmin
+    timeout: 360000
+  log:
+    dir: logs
+    operdb: true
+  ssl:
+    key: keystring
+    pem: temp/pem.pem

@@ -1,0 +1,47 @@
+<link rel="stylesheet" href="public/css/admin.css" media="all">
+<link rel="stylesheet" href="public/css/login.css" media="all">
+<style>
+#LAY-user-auth .layui-progress-big
+{
+    width:60%;
+    margin: auto;
+}
+#LAY-user-auth h3{
+    text-align: center;
+    margin-bottom: 10px;
+}
+</style>
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-auth" style="display: none;">
+    <h3>授权中...</h3>
+    <div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="auth-progress">
+        <div class="layui-progress-bar layui-bg-green" lay-percent="0%">
+            <span class="layui-progress-text"></span>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    layui.use(['form', 'view', 'element', 'app'], function(form, admin) {
+        var search = layui.router().search,
+            element = layui.element,
+            api={
+                loading: function(){
+                    //模拟loading
+                    var n = 0, timer = setInterval(function(){
+                        n = n + Math.random()*50|0;  
+                        if(n>100){
+                            n = 100;
+                            clearInterval(timer);
+                            if(search.t != undefined && search.t){
+                                layui.app.setCookie("jwt", search.t, 4);
+                                window.location = search.redirect ? "/#"+decodeURIComponent(search.redirect) : '/';
+                            }
+                        }
+                        element.progress('auth-progress', n+'%');
+                    }, 300+Math.random()*1000);
+                }
+            };
+            api.loading();
+    });
+</script>
