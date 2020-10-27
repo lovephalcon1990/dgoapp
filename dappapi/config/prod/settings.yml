@@ -13,14 +13,14 @@ settings:
   database:
     db1:
       dbtype: mysql
-      host: 192.168.31.151
+      host: 127.0.0.1
       name: aiwan_admin
       password: root
       port: 3306
       username: root
     db2:
       dbtype: mysql
-      host: 192.168.31.151
+      host: 127.0.0.1
       name: aiwan_stats
       password: root
       port: 3306

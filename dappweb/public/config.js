@@ -13,7 +13,7 @@ layui.define(['laytpl', 'layer', 'element', 'util'], function(exports){
       
       ,debug: false //是否开启调试模式。如开启，接口异常时会抛出异常 URL 等信息
       
-      ,requestUri: "http://127.0.0.1:8082/goapi/v1/"
+      ,requestUri: "http://api.dzpkdev.com/goapi/v1/"
       
       //独立页面路由，可随意添加（无需写参数）
       ,alonePages: [
