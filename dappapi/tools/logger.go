@@ -24,7 +24,7 @@ func InitLogger() {
 	case ModeTest, ModeProd:
 		file, err := os.OpenFile(config2.LogConfig.Dir+"/"+config2.ApplicationConfig.Port+"api-"+time.Now().Format("2006-01-02")+".log", os.O_WRONLY|os.O_APPEND|os.O_CREATE|os.O_SYNC, 0600)
 		if err != nil {
-			log.Fatalln("log init failed")
+			log.Fatalln(err)
 		}
 		var info os.FileInfo
 		info, err = file.Stat()
