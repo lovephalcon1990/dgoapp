@@ -1,3 +1,4 @@
 .vscode/
 dappapi/__debug_bin
 dappapi/logs/*
+dappapi/dappapi.exe

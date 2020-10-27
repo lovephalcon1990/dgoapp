@@ -22,7 +22,7 @@ func InitLogger() {
 		log.SetOutput(os.Stdout)
 		log.SetLevel(log.TraceLevel)
 	case ModeTest, ModeProd:
-		file, err := os.OpenFile(config2.LogConfig.Dir+"/api-"+time.Now().Format("2006-01-02")+".log", os.O_WRONLY|os.O_APPEND|os.O_CREATE|os.O_SYNC, 0600)
+		file, err := os.OpenFile(config2.LogConfig.Dir+"/"+config2.ApplicationConfig.Port+"api-"+time.Now().Format("2006-01-02")+".log", os.O_WRONLY|os.O_APPEND|os.O_CREATE|os.O_SYNC, 0600)
 		if err != nil {
 			log.Fatalln("log init failed")
 		}
@@ -57,9 +57,9 @@ func (p *logFileWriter) Write(data []byte) (n int, err error) {
 	var logFileName string
 	now := time.Now()
 	if mapStr["logFile"] != "" {
-		logFileName = mapStr["logFile"] + "-" + now.Format("2006-01-02") + ".log"
+		logFileName = config2.ApplicationConfig.Port + mapStr["logFile"] + "-" + now.Format("2006-01-02") + ".log"
 	} else {
-		logFileName = "api-" + now.Format("2006-01-02") + ".log"
+		logFileName = config2.ApplicationConfig.Port + "api-" + now.Format("2006-01-02") + ".log"
 	}
 	fileName := path.Join(fileDir, logFileName)
 	if p.file.Name() != fileName {
