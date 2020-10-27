@@ -9,6 +9,7 @@ settings:
     port: "8081"
     readtimeout: 1
     writertimeout: 2
+    cpdz: http://dzpkdev.com/cpapi/
   database:
     db1:
       dbtype: mysql
